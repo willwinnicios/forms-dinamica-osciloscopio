@@ -56,7 +56,7 @@
             overflow: hidden;
             width: 100%;
             max-width: 600px;
-            margin: 20px 15px;
+            margin: 70px 15px 20px 15px; /* Ajuste para não sobrepor o banner fixo */
             transform: translateY(0);
             transition: transform 0.4s ease, box-shadow 0.4s ease;
         }
@@ -291,6 +291,44 @@
             100% { transform: translateY(0); opacity: 1; }
         }
 
+        /* Botão do WhatsApp */
+        .whatsapp-btn {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #25D366;
+            color: #FFF;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .whatsapp-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+            background-color: #20BA56;
+        }
+
+        /* Banner de Contagem Regressiva */
+        .countdown-banner {
+            width: 100%;
+            background: linear-gradient(to right, #D32F2F, #F44336);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
         /* Responsividade para Tablet */
         @media (max-width: 768px) {
             .header {
@@ -337,6 +375,10 @@
     </style>
 </head>
 <body>
+
+    <div class="countdown-banner" id="countdownBanner">
+        ⏳ Inscrições encerram em: <span id="countdown">Carregando...</span>
+    </div>
 
     <div class="form-container" id="formWrapper">
         <div class="header">
@@ -409,6 +451,9 @@
             <div class="success-icon">✔</div>
             <h2>Inscrição Confirmada!</h2>
             <p>Seus dados foram enviados com sucesso. Será um prazer ter você na Dinâmica Oficina!</p>
+            <a href="https://wa.me/5548999824068?text=Olá!%20Acabei%20de%20fazer%20minha%20inscrição%20para%20o%20curso%20de%20osciloscópio%20e%20gostaria%20de%20mais%20informações." target="_blank" class="whatsapp-btn">
+                Falar no WhatsApp
+            </a>
         </div>
     </div>
 
@@ -448,14 +493,12 @@
         // Carregar cidades usando a API do IBGE
         async function loadCities() {
             try {
-                // Trazendo todas as cidades do Brasil
                 const response = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/municipios');
                 const cities = await response.json();
                 
                 const dataList = document.getElementById('cities-list');
                 cities.forEach(city => {
                     const option = document.createElement('option');
-                    // Formatando: "Nome da Cidade - Sigla do Estado"
                     const state = city.microrregiao.mesorregiao.UF.sigla;
                     option.value = `${city.nome} - ${state}`;
                     dataList.appendChild(option);
@@ -464,9 +507,36 @@
                 console.log("Erro ao carregar cidades do IBGE", e);
             }
         }
+
+        // Função do Cronômetro
+        function startCountdown() {
+            // Data de encerramento: 30 de agosto de 2026, fim do dia
+            const targetDate = new Date("2026-08-30T23:59:59").getTime();
+            
+            const interval = setInterval(function() {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+                
+                if (distance < 0) {
+                    clearInterval(interval);
+                    document.getElementById("countdown").innerHTML = "ENCERRADAS";
+                    return;
+                }
+                
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                document.getElementById("countdown").innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+            }, 1000);
+        }
         
-        // Executa a busca de cidades assim que a página carregar
-        window.addEventListener('DOMContentLoaded', loadCities);
+        // Executa as buscas e cronômetro ao carregar
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCities();
+            startCountdown();
+        });
     </script>
 </body>
 </html>
