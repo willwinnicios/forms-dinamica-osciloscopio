@@ -315,18 +315,60 @@
         /* Banner de Contagem Regressiva */
         .countdown-banner {
             width: 100%;
-            background: linear-gradient(to right, #D32F2F, #F44336);
-            color: white;
+            background: rgba(218, 116, 40, 0.25); /* Laranja transparente para o glassmorphism */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(218, 116, 40, 0.4);
+            color: var(--white);
             text-align: center;
-            padding: 12px;
-            font-weight: 700;
-            font-size: 15px;
-            letter-spacing: 0.5px;
+            padding: 10px 15px;
+            font-weight: 600;
+            font-size: 14px;
             position: fixed;
             top: 0;
             left: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .countdown-timer {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .time-box {
+            background: rgba(10, 28, 53, 0.7); /* Azul escuro da marca */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            padding: 5px 8px;
+            display: flex;
+            align-items: baseline;
+            gap: 2px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .time-box span {
+            font-size: 18px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--primary-orange);
+        }
+
+        .time-box small {
+            font-size: 11px;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .separator {
+            font-weight: 700;
+            opacity: 0.5;
         }
 
         /* Responsividade para Tablet */
@@ -377,7 +419,16 @@
 <body>
 
     <div class="countdown-banner" id="countdownBanner">
-        ⏳ Inscrições encerram em: <span id="countdown">Carregando...</span>
+        <span>⏳ Inscrições encerram em:</span>
+        <div class="countdown-timer" id="countdown">
+            <div class="time-box"><span id="cd-days">--</span><small>d</small></div>
+            <span class="separator">:</span>
+            <div class="time-box"><span id="cd-hours">--</span><small>h</small></div>
+            <span class="separator">:</span>
+            <div class="time-box"><span id="cd-minutes">--</span><small>m</small></div>
+            <span class="separator">:</span>
+            <div class="time-box"><span id="cd-seconds">--</span><small>s</small></div>
+        </div>
     </div>
 
     <div class="form-container" id="formWrapper">
@@ -519,16 +570,19 @@
                 
                 if (distance < 0) {
                     clearInterval(interval);
-                    document.getElementById("countdown").innerHTML = "ENCERRADAS";
+                    document.getElementById("countdown").innerHTML = "<div class='time-box'><span>ENCERRADAS</span></div>";
                     return;
                 }
                 
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2, '0');
                 
-                document.getElementById("countdown").innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+                document.getElementById("cd-days").innerText = days;
+                document.getElementById("cd-hours").innerText = hours;
+                document.getElementById("cd-minutes").innerText = minutes;
+                document.getElementById("cd-seconds").innerText = seconds;
             }, 1000);
         }
         
